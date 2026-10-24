@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "airec"
+version = "0.1.0"
+description = "Microphone activity recorder with a Russian Tk interface"
+requires-python = ">=3.10"
+dependencies = ["platformdirs>=4,<5", "psutil>=5.9,<8", "portalocker>=2.8,<4", "pystray>=0.19,<1", "Pillow>=10,<13"]
+
+[project.scripts]
+airec = "airec.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["airec*"]
