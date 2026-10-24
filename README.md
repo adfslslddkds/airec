@@ -21,7 +21,15 @@ python -m airec
 airec/.venv/bin/python -m airec
 ```
 
-Linux Debian/Ubuntu: нужны `python3-tk`, `python3-venv`, `pulseaudio-utils`,
+Готовый Linux-бинарник для x86_64 собирается GitHub Actions на Ubuntu 22.04.
+Скачайте архив `airec-linux-x86_64` из раздела Artifacts запуска workflow,
+распакуйте `airec` и запустите его. Для выполнения нужны системные Tk-библиотеки,
+`pulseaudio-utils`, `xdg-utils` и PulseAudio либо PipeWire с PulseAudio-совместимым
+сервером; AppIndicator/gdbus опциональны, при недоступности приложение работает
+без иконки в трее. One-file бинарник предназначен для Ubuntu 22.04 и новее; на
+других дистрибутивах совместимость зависит от версии glibc и библиотек Tk.
+
+Linux Debian/Ubuntu для запуска из исходников: нужны `python3-tk`, `python3-venv`, `pulseaudio-utils`,
 `xdg-utils`, PulseAudio либо PipeWire с PulseAudio-совместимым сервером.
 Для трея дополнительно нужны `libglib2.0-bin` (gdbus), PyGObject и typelib
 AppIndicator3 или AyatanaAppIndicator3, а также StatusNotifierHost рабочего стола.
@@ -74,12 +82,11 @@ GUI, настройки и операции с существующими WAV н
 
 ## Файлы и настройки
 
-Записи всегда находятся в `recordings` внутри этого проекта, то есть
-`airec/recordings` относительно исходного рабочего пространства. Путь вычисляется
-от расположения модуля storage, не от cwd и не из пользовательских настроек.
-Worker, импорт, список и обе команды открытия папки используют один источник пути.
-Поддерживается запуск из исходников или editable-установка. Установка wheel в
-защищённый site-packages и автономная сборка не поддерживаются.
+При запуске из исходников записи находятся в `recordings` внутри этого проекта,
+то есть `airec/recordings` относительно исходного рабочего пространства. У
+собранного бинарника они сохраняются в `~/.local/share/Airec/recordings`, вне
+временного каталога распаковки one-file. Worker, импорт и GUI используют один путь.
+Настройки и логи находятся в пользовательских каталогах platformdirs.
 
 Активные и аварийные файлы имеют расширение `.partial`. Только после штатной
 остановки parec и проверки PCM WAV файл переименовывается в `.wav`. Незавершённые

@@ -143,9 +143,16 @@ class Service:
         forced = False
         try:
             self.paths.ensure()
+            if getattr(sys, "frozen", False):
+                import multiprocessing
+                multiprocessing.set_executable(sys.executable)
+                command = [sys.executable, "--airec-worker", "--config", json.dumps(config.to_dict())]
+            else:
+                command = [sys.executable, "-u", "-m", "airec.worker", "--config", json.dumps(config.to_dict())]
             self.process = self.launch(
-                [sys.executable, "-u", "-m", "airec.worker", "--config", json.dumps(config.to_dict())],
-                cwd=PROJECT_ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                command, cwd=PROJECT_ROOT,
+                env={**os.environ, "AIREC_PROJECT_ROOT": str(PROJECT_ROOT)},
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE, text=True, encoding="utf-8", bufsize=1,
                 start_new_session=os.name == "posix")
             tree = self.tree_factory(self.process)

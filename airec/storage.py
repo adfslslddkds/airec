@@ -3,6 +3,7 @@ import json
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+import sys
 from pathlib import Path
 import tempfile
 
@@ -11,16 +12,31 @@ import portalocker
 
 from .models import Config
 
-# Source/editable installations only: package parent is the project root.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# Frozen binaries keep recordings outside their temporary extraction directory.
+PROJECT_ROOT = (Path(sys.executable).resolve().parent
+                if getattr(sys, "frozen", False) else Path(__file__).resolve().parent.parent)
+if os.environ.get("AIREC_WORKER") == "1" and getattr(sys, "frozen", False):
+    PROJECT_ROOT = Path(os.environ.get("AIREC_PROJECT_ROOT", Path.cwd())).resolve()
+elif os.environ.get("AIREC_WORKER") == "1":
+    PROJECT_ROOT = Path(os.environ.get("AIREC_PROJECT_ROOT", PROJECT_ROOT)).resolve()
 RECORDINGS = PROJECT_ROOT / "recordings"
+
+
+def recordings_path():
+    if getattr(sys, "frozen", False) or os.environ.get("AIREC_WORKER") == "1":
+        return Path(PlatformDirs("Airec", appauthor=False).user_data_dir) / "recordings"
+    return RECORDINGS
 
 
 @dataclass(frozen=True)
 class Paths:
     config: Path
     logs: Path
-    recordings: Path = RECORDINGS
+    recordings: Path | None = None
+
+    def __post_init__(self):
+        if self.recordings is None:
+            object.__setattr__(self, "recordings", recordings_path())
 
     @classmethod
     def discover(cls):

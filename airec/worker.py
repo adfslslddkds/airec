@@ -81,10 +81,10 @@ def run(backend, repository, config, stop, send=emit):
         send("exited", clean=not failed)
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     paths = Paths.discover()
     configure_logging(paths.logs, "worker")
     stop = threading.Event()
@@ -93,7 +93,7 @@ def main():
     threading.Thread(target=listen, args=(sys.stdin, stop), daemon=True).start()
     try:
         config = Config.from_dict(json.loads(args.config))
-        run(get_backend(), Repository(), config, stop)
+        run(get_backend(), Repository(paths.recordings), config, stop)
     except Exception as exc:
         logging.exception("Worker initialization failed")
         emit("error", detail=str(exc))

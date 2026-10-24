@@ -6,7 +6,7 @@ import shutil
 import uuid
 import wave
 
-from .storage import RECORDINGS
+from .storage import recordings_path
 
 
 @dataclass(frozen=True)
@@ -33,8 +33,8 @@ def duration(path):
 
 
 class Repository:
-    def __init__(self, folder=RECORDINGS):
-        self.folder = Path(folder).resolve()
+    def __init__(self, folder=None):
+        self.folder = Path(folder if folder is not None else recordings_path()).resolve()
         self.folder.mkdir(parents=True, exist_ok=True)
 
     def managed(self, path, completed=False):

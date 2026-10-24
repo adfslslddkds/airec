@@ -16,7 +16,7 @@ def main():
         lock = Singleton(paths.config.parent / "instance.lock")
         lock.acquire()
         configure_logging(paths.logs, "application")
-        app = Application(Service(paths), ConfigStore(paths.config), Repository(), lock)
+        app = Application(Service(paths), ConfigStore(paths.config), Repository(paths.recordings), lock)
     except Exception as exc:
         logging.exception("Startup failed")
         if lock:

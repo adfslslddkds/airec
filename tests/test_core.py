@@ -42,8 +42,14 @@ class StorageTests(unittest.TestCase):
             self.assertEqual(Paths.discover().recordings, RECORDINGS)
             self.assertTrue(RECORDINGS.is_absolute())
             self.assertEqual(RECORDINGS.parent.name, 'airec')
+            with patch('airec.storage.sys.frozen', True, create=True), patch(
+                    'airec.storage.PlatformDirs') as dirs:
+                dirs.return_value.user_data_dir = str(self.root / 'user-data')
+                from airec.storage import recordings_path
+                self.assertEqual(recordings_path(), self.root / 'user-data' / 'recordings')
         finally:
             os.chdir(original)
+
 
     def test_config_validation_and_roundtrip(self):
         store = ConfigStore(self.root / 'settings.json')
