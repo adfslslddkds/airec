@@ -35,6 +35,11 @@ airec/.venv/bin/python -m airec
 предоставляет GUI и работу с существующими WAV, но запись аудио на Windows пока
 не реализована.
 
+Готовый macOS-бинарник для Apple Silicon собирается GitHub Actions на `macos-14`.
+Скачайте архив `airec-macos-arm64` из раздела Artifacts, распакуйте его и запустите
+`airec`. Бинарник не подписан и не нотариализован; macOS может потребовать разрешить
+запуск в настройках безопасности. Запись аудио на macOS пока не реализована.
+
 Linux Debian/Ubuntu для запуска из исходников: нужны `python3-tk`, `python3-venv`, `pulseaudio-utils`,
 `xdg-utils`, PulseAudio либо PipeWire с PulseAudio-совместимым сервером.
 Для трея дополнительно нужны `libglib2.0-bin` (gdbus), PyGObject и typelib

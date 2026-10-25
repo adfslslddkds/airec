@@ -1,0 +1,54 @@
+name: macOS one-file build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: macos-14
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project and build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pyinstaller==6.11.1
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Build one-file executable
+        run: pyinstaller --clean --noconfirm airec.spec
+
+      - name: Verify executable starts
+        run: |
+          test -x dist/airec
+          timeout 5s dist/airec || test "$?" -eq 124
+
+      - name: Package artifact and checksum
+        run: |
+          mkdir -p artifact
+          ditto -c -k --sequesterRsrc --keepParent dist/airec artifact/airec-macos-arm64.zip
+          shasum -a 256 artifact/airec-macos-arm64.zip > artifact/airec-macos-arm64.zip.sha256
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: airec-macos-arm64
+          path: artifact/*
+          if-no-files-found: error
+          retention-days: 14
+`
