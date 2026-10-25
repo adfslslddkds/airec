@@ -192,7 +192,7 @@ class BackendTests(unittest.TestCase):
             backend.start(Path('/tmp/test.partial'))
         args = launch.call_args.args[0]
         self.assertIn('--file-format=wav', args)
-        self.assertEqual(args[-1], '/tmp/test.partial')
+        self.assertEqual(Path(args[-1]), Path('/tmp/test.partial'))
         self.assertFalse(any(arg.startswith('--file=') for arg in args))
 
     def test_capture_escalation_retains_on_refusal(self):
